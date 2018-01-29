@@ -1,0 +1,22 @@
+.btn-primary {
+    color: #fff;
+    background-color: rgb(56,176,194);
+    border-color: rgb(53, 101, 108);
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: rgb(42, 136, 156);
+    border-color: rgb(53, 101, 108);
+}
+
+
+.btn-primary:not(:disabled):not(.disabled):active {
+    color: #fff;
+    background-color: rgb(42, 136, 156);
+    border-color: rgb(53, 101, 108);
+}
+
+.btn-primary:focus {
+    box-shadow: 0 0 0 .2rem rgba(47, 145, 171, 0.5);
+}
