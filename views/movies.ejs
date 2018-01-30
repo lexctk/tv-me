@@ -19,7 +19,8 @@
                 <img src="<%= movie.image %>" alt="<%= movie.name %>" class="card-img-top">
                 <div class="card-body">
                     <h5 class="card-title"><%= movie.name %></h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <p class="card-text"><%= movie.description %></p>
+                    <a class="btn btn-primary btn-sm" href="/movies/<%= movie.id %>" role="button">More Info</a>
                 </div>                
             </div></div>
         <% }); %>
