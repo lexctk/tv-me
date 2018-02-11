@@ -2,48 +2,43 @@ var express = require ("express");
 var app = express();
 var bodyParser = require ("body-parser");
 var mongoose = require ("mongoose");
+var Tvtitle = require ("./models/tvtitle");
+var Comment = require ("./models/comment");
+var seedDB = require ("./seeds");
 
 mongoose.connect("mongodb://localhost/tvtitle");
-app.use (express.static("public"));
+app.use (express.static(__dirname + "public"));
 app.use (bodyParser.urlencoded( { extended : true } ));
 
 app.set ("view engine", "ejs");
 
-//schema Setup
-var tvtitleSchema = new mongoose.Schema({
-    name: String,
-    image: String,
-    slug: String,
-    description: String
-});
-
-//compiling schema into a model
-var Tvtitle = mongoose.model("Tvtitle", tvtitleSchema);
+//temporary seed db function
+//seedDB();
 
 //routes
-app.get("/", function (req, res) {
+app.get ("/", function (req, res) {
     res.render("index");  
 });
 
 //INDEX route - Show all movies
-app.get("/movies", function (req, res) {
+app.get ("/movies", function (req, res) {
     //get all movies from the database
     Tvtitle.find ({}, function (error, movies) {
         if (error) {
             console.log (error);
         } else {
-            res.render("movies", {movies : movies});
+            res.render("movies/index", {movies : movies});
         }
     })
 });
 
 //NEW route - Show form to add new movie
 app.get ("/movies/new", function (req, res) {
-    res.render("new");
+    res.render("movies/new");
 });
 
 //CREATE route - Add new movie to db
-app.post("/movies", function (req, res) {
+app.post ("/movies", function (req, res) {
     //get data from form POST action
     var title = new Tvtitle ({
         name: req.body.name,
@@ -69,16 +64,53 @@ app.post("/movies", function (req, res) {
 })
 
 //SHOW route - Show info for one title
-app.get("/movies/:id", function (req, res) {
+app.get ("/movies/:id", function (req, res) {
     //find movie in db
-    Tvtitle.findById (req.params.id, function (error, title){
+    Tvtitle.findById (req.params.id).populate("comments").exec(function (error, title){
         if (error) {
             console.log(error);
         } else {
             //render show page:
-            res.render("show", {title : title});
+            res.render("movies/show", {title : title});
         }
     });
+});
+
+//comments NEW
+app.get ("/movies/:id/comments/new", function (req, res) {
+    Tvtitle.findById(req.params.id, function (error, title) {
+        if (error) {
+            console.log ("Couldn't find corresponding title " + error);
+        } else {
+            res.render("comments/new", {title : title});    
+        }
+    });
+});
+
+//comments CREATE
+app.post ("/movies/:id/comments", function (req, res) {
+    //find movie
+    Tvtitle.findById(req.params.id, function(error, title) {
+        if (error) {
+            console.log ("Couldn't find corresponding title " + error);
+        } else {
+            Comment.create(req.body.comment, function (error, comment) {
+                if (error) {
+                    console.log ("Couldn't create comment " + error);
+                } else {
+                    
+                    title.comments.push(comment._id);
+                    title.save( function (error, title) {
+                        if (error) {
+                            console.log("Couldn't save comment " + error);
+                        } else {
+                            res.redirect ("/movies/" + title._id);
+                        }
+                    });
+                }
+            });
+        }
+    });    
 });
 
 //listen

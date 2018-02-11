@@ -1,0 +1,32 @@
+<% include ../partials/header %>
+
+<div class="container">
+    <header class="jumbotron"><div class="container">
+        <h1 class="display-4">Movies</h1>
+        <p class="lead">Welcome to the Movies section, view some hand picked titles below </p>
+        
+        <hr class="my-4">
+        
+        <p>Add new titles to the list</p>
+        <p class="lead">
+            <a class="btn btn-primary btn-sm" href="/movies/new" role="button">Add New</a>
+        </p>
+    </div></header>
+    
+    <div class="row">
+        <% movies.forEach(function (movie) { %>
+            <div class="col-md-3 col sm-6 card-group">
+                <div class="card">
+                    <img src="<%= movie.image %>" alt="<%= movie.name %>" class="card-img-top">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= movie.name %></h5>
+                        <p class="card-text"><%= movie.description %></p>
+                        <a class="btn btn-primary btn-sm" href="/movies/<%= movie.id %>" role="button">More Info</a>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<% include ../partials/footer %>
