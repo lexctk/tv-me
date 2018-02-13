@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 - 
+## [0.0.5] - 2018-02-13
+### Changed
+- Refactoring with express router
+- Middleware
+
 ## [0.0.4] - 2018-02-13
 ### Added
 - Authentication
