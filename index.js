@@ -8,8 +8,6 @@ var express     = require ("express"),
     LocalStrategy   = require ("passport-local"),
 
     // models
-    Tvtitle = require ("./models/tvtitle"),
-    Comment = require ("./models/comment"),
     User    = require ("./models/user"),
 
     // routes
@@ -24,35 +22,35 @@ mongoose.connect("mongodb://localhost/tvtitle");
 
 app.set ("view engine", "ejs");
 
-app.use(express.static(__dirname + "/public"));
+app.use (express.static(__dirname + "/public"));
 app.use (bodyParser.urlencoded( { extended : true } ));
 
 // authentication
-app.use(require("express-session")({
+app.use (require("express-session")({
     secret: "Some phrase", //TODO: figure out how to exclude from github
     resave: false,
     saveUninitialized: false
 }));
-app.use(passport.initialize());
-app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+app.use (passport.initialize());
+app.use (passport.session());
+passport.use (new LocalStrategy(User.authenticate()));
+passport.serializeUser (User.serializeUser());
+passport.deserializeUser (User.deserializeUser());
 
 // middleware that runs on every route
-app.use(function (req, res, next) {
+app.use (function (req, res, next) {
     res.locals.currentUser = req.user;
     next();
 });
 
 // use routes
-app.use(authenticationRoutes);
-app.use("/movies", moviesRoutes);
-app.use("/movies/:id/comments", commentsRoutes);
+app.use (authenticationRoutes);
+app.use ("/movies", moviesRoutes);
+app.use ("/movies/:id/comments", commentsRoutes);
 
 
 // seeding database
-//seedDB();
+// seedDB();
 
 // root
 app.get ("/", function (req, res) {
@@ -63,13 +61,3 @@ app.get ("/", function (req, res) {
 app.listen (process.env.PORT, process.env.IP, function () {
     console.log ("Server listening"); 
 });
-
-// used to turn title into slug
-function slugify(text) {
-  return text.toString().toLowerCase()
-    .replace(/\s+/g, '-')           // Replace spaces with -
-    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-    .replace(/^-+/, '')             // Trim - from start of text
-    .replace(/-+$/, '');            // Trim - from end of text
-}

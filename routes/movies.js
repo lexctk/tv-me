@@ -1,7 +1,8 @@
 var express = require ("express"),
     router  = express.Router ();
 
-var Tvtitle = require ("../models/tvtitle");
+var Tvtitle = require ("../models/tvtitle"),
+    Comment = require ("../models/comment");
 
 var middleware = require ("../middleware");
 
@@ -57,12 +58,29 @@ router.get ("/:id", function (req, res) {
     //find movie in db
     Tvtitle.findById (req.params.id).populate("comments").exec(function (error, title){
         if (error) {
-            console.log(error);
+            console.log (error);
         } else {
-            // render show page:
-            res.render("movies/show", {title : title});
+            // Populating any comments with author name
+            Comment.populate (title, {
+                path: "comments.author",
+                select: "username",
+                model: "User"
+            }, function (error, title) {
+                // render show page:
+                res.render ("movies/show", {title : title});                
+            });
         }
     });
 });
+
+// used to turn title into slug
+function slugify (text) {
+  return text.toString().toLowerCase()
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+    .replace(/^-+/, '')             // Trim - from start of text
+    .replace(/-+$/, '');            // Trim - from end of text
+}
 
 module.exports = router;

@@ -2,7 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-- 
+- Associate comments and users
+
 ## [0.0.5] - 2018-02-13
 ### Changed
 - Refactoring with express router

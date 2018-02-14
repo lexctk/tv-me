@@ -28,12 +28,19 @@ router.post ("/", middleware.isLoggedIn, function (req, res) {
         if (error) {
             console.log ("Couldn't find corresponding title " + error);
         } else {
-            Comment.create(req.body.comment, function (error, comment) {
+            Comment.create (req.body.comment, function (error, comment) {
                 if (error) {
                     console.log ("Couldn't create comment " + error);
                 } else {
+                    comment.author = req.user._id;
+                    comment.save (function (error, comment) {
+                        if (error) {
+                            console.log ("Couldn't save comment " + error);
+                        }
+                    });
+                    
                     title.comments.push(comment._id);
-                    title.save( function (error, title) {
+                    title.save (function (error, title) {
                         if (error) {
                             console.log("Couldn't save comment " + error);
                         } else {
