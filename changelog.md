@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [0.0.7] - 2018-02-14
+### Added
+- Associate new titles and users
+
+## [0.0.6] - 2018-02-14
+### Added
 - Associate comments and users
 
 ## [0.0.5] - 2018-02-13

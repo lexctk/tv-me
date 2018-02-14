@@ -34,7 +34,8 @@ router.post ("/", middleware.isLoggedIn, function (req, res) {
         name: req.body.name,
         image: req.body.image,
         slug: slugify(req.body.name),
-        description: req.body.description
+        description: req.body.description,
+        author: req.user._id
     });
     
     // save to database
@@ -43,24 +44,19 @@ router.post ("/", middleware.isLoggedIn, function (req, res) {
             console.log("Something went wrong");
             console.log(error);
         } else {
-            console.log("Added a new title!");
-            console.log(title);
+            res.redirect ("/movies");
         }
     }); 
-    
-    // redirect back to /movies page
-    res.redirect ("/movies");
-    
 });
 
 // SHOW route - Show info for one title
 router.get ("/:id", function (req, res) {
-    //find movie in db
-    Tvtitle.findById (req.params.id).populate("comments").exec(function (error, title){
+    //find movie in db, populate both comments and author
+    Tvtitle.findById (req.params.id).populate("comments author").exec(function (error, title){
         if (error) {
             console.log (error);
         } else {
-            // Populating any comments with author name
+            // populate any comments with comment author name
             Comment.populate (title, {
                 path: "comments.author",
                 select: "username",
