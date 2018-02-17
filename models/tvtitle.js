@@ -12,12 +12,10 @@ var tvtitleSchema = new mongoose.Schema({
             ref: "Comment"
         }
     ],
-    author: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        }
-    ]
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }
 });
 
 //compiling schema into a model

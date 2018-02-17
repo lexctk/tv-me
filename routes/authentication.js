@@ -29,11 +29,27 @@ router.get("/login", function (req, res) {
     res.render ("login");
 });
 
-router.post("/login", passport.authenticate("local", {
-    successRedirect: "/movies",
-    failureRedirect: "/login"
-}), function (req, res) {
-        
+router.post("/login", function (req, res, next) {
+    passport.authenticate("local", function (error, user, info) {
+        if (error) { 
+            return next(error); 
+        }
+        // Redirect if it fails
+        if (!user) { 
+            return res.redirect("/login"); 
+        }
+        req.logIn(user, function(error) {
+            if (error) { 
+                return next(error); 
+            }
+            // Redirect if it succeeds, to previous page if it exists
+            if (req.session.returnTo) {
+                return res.redirect(req.session.returnTo);
+            }
+            
+            return res.redirect("/movies");
+        });
+    }) (req, res, next);
 });
 
 router.get("/logout", function (req, res) {

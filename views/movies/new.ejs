@@ -6,17 +6,18 @@
     <form action="/movies" method="POST">
         <div class="form-group">
             <label for="name">Enter new title name</label>
-            <input name="name" id="name" class="form-control" type="text" placeholder="Title">
+            <input name="title[name]" id="name" class="form-control" type="text" placeholder="Title">
         </div>
         <div class="form-group">  
             <label for="image">Enter poster URL</label>
-            <input name="image" id="image" class="form-control" type="text" placeholder="Image URL">
+            <input name="title[image]" id="image" class="form-control" type="text" placeholder="Image URL">
         </div>
         <div class="form-group">  
             <label for="description">Enter short description</label>
-            <input name="description" id="description" class="form-control" type="text" placeholder="Description">
+            <input name="title[description]" id="description" class="form-control" type="text" placeholder="Description">
         </div>
         <div class="form-group">
+            <label for="user[username]">Author</label>
             <input name="user[username]" id="user[username]" class="form-control" type="text" value="<%= currentUser.username %>" readonly>
         </div>        
         <button type="submit" class="btn btn-primary">Submit</button>

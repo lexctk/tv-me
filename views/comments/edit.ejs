@@ -1,0 +1,16 @@
+<% include ../partials/header %>
+
+<div class="container">
+    <h1>Edit <%= comment.author.username %>'s comment</h1>
+
+    <form action="/movies/<%= title %>/comments/<%= comment._id %>?_method=PUT" method="POST">
+        <div class="form-group">  
+            <label for="text">Comment</label>
+            <textarea name="comment[text]" id="text" class="form-control" rows="10"><%= comment.text %></textarea>
+        </div>        
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>    
+    
+</div>
+
+<% include ../partials/footer %>

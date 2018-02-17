@@ -9,11 +9,22 @@
         <div class="col-md-9">
             <div class="spacer-small"><%= title.description %></div>
             <ul class="list-group spacer-small">
-              <li class="list-group-item">Category</li>
-              <li class="list-group-item">Year</li>
-              <li class="list-group-item">Rating</li>
-              <li class="list-group-item">Added by: <span><%= title.author[0].username %></span></li>
-            </ul>            
+                <li class="list-group-item">Category</li>
+                <li class="list-group-item">Year</li>
+                <li class="list-group-item">Rating</li>
+                <li class="list-group-item">Added by: <span><%= title.author.username %></span></li>
+            </ul>
+        <div class="spacer d-flex justify-content-end no-padd-right">
+            <% if (currentUser && title.author.equals(currentUser._id)) { %>
+                <form action="/movies/<%= title._id %>/edit" method="GET" class="p-2 inline">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
+                </form>
+                <form action="/movies/<%= title._id %>?_method=DELETE" method="POST" class="p-2 inline">
+                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i> Delete</button>
+                </form>
+            <% } %>
+        </div>
+           
         </div>
     </div>
 </div>
@@ -24,11 +35,22 @@
         <% title.comments.forEach (function (comment) { %>
             <div class="comment spacer-small">
                 <div class="comment-body">
-                    <%= comment.text %>
-                    <footer class="comment-footer">
-                        <span class="comment-author small"> <%= comment.author[0].username %></span>
-                        <span class="comment-date small float-right">February, 14th, 2018</span>
-                    </footer>                    
+                    <h5 class="comment-author">
+                        <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp; &nbsp; 
+                        <%= comment.author.username %>
+                    </h5>
+                    <span class="content"><%- comment.text %></span>
+                    <footer class="comment-footer d-flex no-padd-left">
+                        <div class="p-2 mr-auto comment-date small">February, 14th, 2018</div>
+                        <% if (currentUser && comment.author.equals(currentUser._id)) { %>    
+                            <form action="/movies/<%= title._id %>/comments/<%= comment._id %>/edit" method="GET" class="p-2 inline">
+                                <button type="submit" class="no-button"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                            </form>
+                            <form action="/movies/<%= title._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST" class="p-2 inline">
+                                <button type="submit" class="no-button"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                            </form>
+                        <% } %>
+                    </footer>
                 </div>
             </div>
         <% }); %>        

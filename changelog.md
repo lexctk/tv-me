@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.0.8] - 2018-02-17
+### Added
+- Add delete, edit, update routes for titles
+- Add isOwner middleware to limit EDIT/DELETE to title owner
+- Add delete, edit, update routes for comments
+- Add isCommentOwner middleware
+
+### Changed
+- Redirect to original path after login
+
 ## [0.0.7] - 2018-02-14
 ### Added
 - Associate new titles and users
