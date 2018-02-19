@@ -6,6 +6,8 @@ var tvtitleSchema = new mongoose.Schema({
     image: String,
     slug: String,
     description: String, 
+    year: Number,
+    updatedAt: { type: Date, default: Date.now },
     comments: [
         {
             type: mongoose.Schema.Types.ObjectId,

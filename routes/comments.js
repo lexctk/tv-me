@@ -13,8 +13,10 @@ var middleware = require ("../middleware");
 // comments NEW
 router.get ("/new", middleware.isLoggedIn, function (req, res) {
     Tvtitle.findById(req.params.id, function (error, title) {
-        if (error) {
+        if (error || !title) {
             console.log ("Couldn't find corresponding title " + error);
+            req.flash ("error", "Couldn't find corresponding title!");
+            res.redirect ("back");
         } else {
             res.render("comments/new", {title : title});    
         }
@@ -25,8 +27,10 @@ router.get ("/new", middleware.isLoggedIn, function (req, res) {
 router.post ("/", middleware.isLoggedIn, function (req, res) {
     //find movie
     Tvtitle.findById(req.params.id, function(error, title) {
-        if (error) {
-            console.log ("Couldn't find corresponding title " + error);
+        if (error || !title) {
+            console.log (error);
+            req.flash ("error", "Couldn't find corresponding title!");
+            res.redirect ("back");            
         } else {
             req.body.comment.text = req.sanitize(req.body.comment.text);
             
@@ -56,24 +60,38 @@ router.post ("/", middleware.isLoggedIn, function (req, res) {
 });
 
 // comments EDIT
-router.get ("/:idComment/edit", middleware.isCommentOwner, function (req, res) {
-    Comment.findById (req.params.idComment).populate("author").exec (function (error, comment) {
-        if (error) {
-            console.log ("Couldn't find comment to edit " + error);
+router.get ("/:idComment/edit", middleware.isLoggedIn, middleware.isCommentOwner, function (req, res) {
+    Tvtitle.findById(req.params.id, function (error, title) {
+        if (error || !title) {
+            console.log(error);
+            req.flash ("error", "Couldn't find corresponding title!");
+            res.redirect ("back");            
         } else {
-            res.render ("comments/edit", {comment : comment, title : req.params.id});
+            Comment.findById (req.params.idComment).populate("author").exec (function (error, comment) {
+                if (error || !comment) {
+                    console.log (error);
+                    req.flash ("error", "Couldn't find comment!");
+                    res.redirect ("back");                      
+                } else {
+                    res.render ("comments/edit", {comment : comment, title : req.params.id});
+                }
+            });            
         }
     });
+
 });
 
 // comments UPDATE
-router.put ("/:idComment", middleware.isCommentOwner, function (req, res) {
+router.put ("/:idComment", middleware.isLoggedIn, middleware.isCommentOwner, function (req, res) {
     
     req.body.comment.text = req.sanitize(req.body.comment.text);
+    req.body.comment.updateAt = new Date();
     
     Comment.findByIdAndUpdate (req.params.idComment, req.body.comment, function (error, comment) {
-        if (error) {
-            console.log ("Couldn't find and update comment " + error);
+        if (error || !comment) {
+            console.log (error);
+            req.flash ("error", "Couldn't find comment!");
+            res.redirect ("back");              
         } else {
             res.redirect ("/movies/" + req.params.id);
         }
@@ -82,10 +100,12 @@ router.put ("/:idComment", middleware.isCommentOwner, function (req, res) {
 
 
 // comments DESTROY
-router.delete ("/:idComment", middleware.isCommentOwner, function (req, res) {
+router.delete ("/:idComment", middleware.isLoggedIn, middleware.isCommentOwner, function (req, res) {
     Comment.findByIdAndRemove (req.params.idComment, function (error, comment) {
-        if (error) {
-            console.log ("Couldn't find and delete comment " + error);
+        if (error || !comment) {
+            console.log (error);
+            req.flash ("error", "Couldn't find comment!");
+            res.redirect ("back");              
         } else {
             // also deleting reference from title
             Tvtitle.update (
@@ -102,6 +122,5 @@ router.delete ("/:idComment", middleware.isCommentOwner, function (req, res) {
         }
     });
 });
-
 
 module.exports = router;

@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.0.9] - 2018-02-19
+### Added
+- Add error handling with flash messages
+- Add updatedAt field for both comments and titles
+- Add pagination to title index
+
+### Changed
+- Use environment variables for database and secret key
+
 ## [0.0.8] - 2018-02-17
 ### Added
 - Add delete, edit, update routes for titles

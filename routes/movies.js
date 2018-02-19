@@ -12,13 +12,26 @@ var middleware = require ("../middleware");
 
 // INDEX route - Show all movies
 router.get ("/", function (req, res) {
+    var perPage = 8;
+    var pageQuery = parseInt(req.query.page);
+    var pageNumber = pageQuery ? pageQuery : 1;
+    
     //get all movies from the database
-    Tvtitle.find ({}, function (error, movies) {
-        if (error) {
-            console.log ("Couldn't find all " + error);
-        } else {
-            res.render("movies/index", {movies : movies});
-        }
+    Tvtitle.find ({}).skip((perPage * pageNumber) - perPage).limit(perPage).exec (function (error, movies) {
+        Tvtitle.count().exec (function (error, count) {
+            if (error) {
+                console.log (error);
+                req.flash ("error", "Something went wrong!");
+                res.redirect ("back");
+            } else {
+                res.render("movies/index", {
+                        movies : movies,
+                        current: pageNumber,
+                        pages: Math.ceil(count / perPage)
+                        
+                });
+            }
+        });
     });
 });
 
@@ -34,9 +47,12 @@ router.post ("/", middleware.isLoggedIn, function (req, res) {
     title.author = req.user._id;
     
     Tvtitle.create (title, function (error, title) {
-        if (error) {
-            console.log("Couldn't create title " + title + error);
+        if (error || !title) {
+            console.log(error);
+            req.flash ("error", "Something went wrong!");
+            res.redirect ("back");            
         } else {
+            req.flash ("success", "Added new title!");
             res.redirect ("/movies");
         }
     }); 
@@ -46,8 +62,10 @@ router.post ("/", middleware.isLoggedIn, function (req, res) {
 router.get ("/:id", function (req, res) {
     //find movie in db, populate both comments and author
     Tvtitle.findById (req.params.id).populate("comments author").exec(function (error, title){
-        if (error) {
+        if (error || !title) {
             console.log (error);
+            req.flash ("error", "Something went wrong!");
+            res.redirect ("back");            
         } else {
             // populate any comments with comment author name
             Comment.populate (title, {
@@ -63,10 +81,12 @@ router.get ("/:id", function (req, res) {
 });
 
 // EDIT route - show form to edit
-router.get ("/:id/edit", middleware.isOwner, function (req, res) {
+router.get ("/:id/edit", middleware.isLoggedIn, middleware.isTitleOwner, function (req, res) {
     Tvtitle.findById (req.params.id).populate("author").exec (function (error, title) {
-        if (error) {
-            console.log ("Couldn't find title to edit " + error);
+        if (error || !title) {
+            console.log (error);
+            req.flash ("error", "Something went wrong!");
+            res.redirect ("back");            
         } else {
             res.render ("movies/edit", {title : title});
         }
@@ -74,26 +94,31 @@ router.get ("/:id/edit", middleware.isOwner, function (req, res) {
 });
 
 // UPDATE route - update title
-router.put ("/:id", middleware.isOwner, function (req, res) {
+router.put ("/:id", middleware.isLoggedIn, middleware.isTitleOwner, function (req, res) {
     //re-slugify for updated title!
     req.body.title.slug = slugify(req.body.title.name);
+    req.body.title.updatedAt = new Date();
     
     Tvtitle.findByIdAndUpdate (req.params.id, req.body.title, function (error, title) {
-        if (error) {
-            console.log ("Couldn't find and update " + error);
+        if (error || !title) {
+            console.log (error);
+            req.flash ("error", "Something went wrong!");
+            res.redirect ("back");            
         } else {
+            req.flash ("success", "Info updated");
             res.redirect ("/movies/" + req.params.id);
         }
     });
 });
 
 // DESTROY route
-router.delete ("/:id", middleware.isOwner, function (req, res) {
+router.delete ("/:id", middleware.isLoggedIn, middleware.isTitleOwner, function (req, res) {
     
     // delete all associated comments
     Tvtitle.findById (req.params.id).populate("comments").exec (function (error, title) {
-        if (error) {
-            console.log ("Couldn't show title page " + error);
+        if (error || !title) {
+            console.log (error);
+            req.flash ("error", "Something went wrong!");
         } else {
             title.comments.forEach (function (comment) {
                 Comment.findByIdAndRemove(comment._id, function (error) {
@@ -108,9 +133,12 @@ router.delete ("/:id", middleware.isOwner, function (req, res) {
     });
     
     Tvtitle.findByIdAndRemove(req.params.id, function (error, title) {
-        if (error) {
-            console.log ("Couldn't delete title " + error);
+        if (error || !title) {
+            console.log (error);
+            req.flash ("error", "Something went wrong!");
+            res.redirect ("back");            
         } else {
+            req.flash ("success", "Title deleted!");
             res.redirect ("/movies");
         }
     });

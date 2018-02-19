@@ -16,9 +16,10 @@ router.post("/register", function (req, res) {
     User.register(new User({username: req.body.username, email: req.body.email}), req.body.password, function (error, user) {
         if (error) {
             console.log ("Couldn't register " + error);
-            return res.render ("register");
+            return res.render("register", {"error": error.message});
         }
         passport.authenticate ("local")(req, res, function (){
+            req.flash ("success", "Welcome back " + user.username);
             res.redirect("/movies");
         });
     });
@@ -36,12 +37,15 @@ router.post("/login", function (req, res, next) {
         }
         // Redirect if it fails
         if (!user) { 
+            req.flash("error", error.message);
             return res.redirect("/login"); 
         }
         req.logIn(user, function(error) {
             if (error) { 
                 return next(error); 
             }
+            
+            req.flash("success", "Welcome back, " + user.username);
             // Redirect if it succeeds, to previous page if it exists
             if (req.session.returnTo) {
                 return res.redirect(req.session.returnTo);
@@ -54,6 +58,7 @@ router.post("/login", function (req, res, next) {
 
 router.get("/logout", function (req, res) {
     req.logout();
+    req.flash ("success", "You were logged out!");
     res.redirect("/");
 });
 

@@ -1,7 +1,9 @@
 <% include ../partials/header %>
+<% include ../partials/navbar %>
 
 <div class="container spacer-small">
     <h1><%= title.name %></h1>
+    <p><small class="text-muted">Added by: <%= title.author.username %>, Last modified: <%= moment(title.updatedAt).format(dateFormat); %></small></p>
     <div class="row">
         <div class="col-md-3">
             <img src="<%= title.image %>" alt="<%= title.name %>" class="spacer-small img-fluid">
@@ -9,10 +11,9 @@
         <div class="col-md-9">
             <div class="spacer-small"><%= title.description %></div>
             <ul class="list-group spacer-small">
-                <li class="list-group-item">Category</li>
-                <li class="list-group-item">Year</li>
-                <li class="list-group-item">Rating</li>
-                <li class="list-group-item">Added by: <span><%= title.author.username %></span></li>
+                <li class="list-group-item d-flex justify-content-between p-2"><div class="p-2">Category</div><div class="p-2"></div></li>
+                <li class="list-group-item d-flex justify-content-between p-2"><div class="p-2">Year</div><div class="p-2"><%= title.year %></div></li>
+                <li class="list-group-item d-flex justify-content-between p-2"><div class="p-2">Rating</div><div class="p-2"></div></li>
             </ul>
         <div class="spacer d-flex justify-content-end no-padd-right">
             <% if (currentUser && title.author.equals(currentUser._id)) { %>
@@ -41,7 +42,7 @@
                     </h5>
                     <span class="content"><%- comment.text %></span>
                     <footer class="comment-footer d-flex no-padd-left">
-                        <div class="p-2 mr-auto comment-date small">February, 14th, 2018</div>
+                        <div class="p-2 mr-auto comment-date small"><%= moment(comment.updatedAt).format(dateFormat); %></div>
                         <% if (currentUser && comment.author.equals(currentUser._id)) { %>    
                             <form action="/movies/<%= title._id %>/comments/<%= comment._id %>/edit" method="GET" class="p-2 inline">
                                 <button type="submit" class="no-button"><i class="fa fa-pencil" aria-hidden="true"></i></button>

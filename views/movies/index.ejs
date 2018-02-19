@@ -1,4 +1,5 @@
 <% include ../partials/header %>
+<% include ../partials/navbar %>
 
 <div class="container">
     <header class="jumbotron"><div class="container">
@@ -15,10 +16,12 @@
     
     <div class="row">
         <% movies.forEach(function (movie) { %>
-            <div class="col-md-3 col sm-6 card-group">
+            <div class="col-md-3 col sm-6 card-group pt-2">
                 <div class="card">
-                    <img src="<%= movie.image %>" alt="<%= movie.name %>" class="card-img-top">
-                    <div class="card-body">
+                    <a href="/movies/<%= movie.id %>">
+                        <img src="<%= movie.image %>" alt="<%= movie.name %>" class="card-img-top">
+                    </a>
+                    <div class="card-body text-center">
                         <h5 class="card-title"><%= movie.name %></h5>
                         <p class="card-text"><%= movie.description %></p>
                         <a class="btn btn-primary btn-sm" href="/movies/<%= movie.id %>" role="button">More Info</a>
@@ -27,6 +30,52 @@
             </div>
         <% }); %>
     </div>
+
+    <div class="spacer-small"><nav aria-label="pagination">
+        <% if (pages && pages > 0) { %>
+        <ul class="pagination justify-content-center">
+            <% if (current == 1) { %>
+                <li class="page-item disabled"><a class="page-link">First</a></li>
+            <% } else { %>
+                <li class="page-item"><a class="page-link" href="/movies">First</a></li>
+            <% } %>
+     
+            <% if (current == 1) { %>
+                <li class="page-item disabled"><a class="page-link">«</a></li>
+            <% } else { %>
+                <li class="page-item"><a class="page-link" href="/movies?page=<%= Number(current) - 1 %>">«</a></li>
+            <% } %>
+     
+            <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+            <% if (i !== 1) { %>
+                <li class="page-item disabled"><a class="page-link">...</a></li>
+            <% } %>
+            <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
+                <% if (i == current) { %>
+                    <li class="page-item active"><a class="page-link"><%= i %></a></li>
+                <% } else { %>
+                    <li class="page-item"><a class="page-link" href="/movies?page=<%= i %>"><%= i %></a></li>
+                <% } %>
+                 <% if (i == Number(current) + 4 && i < pages) { %>
+                    <li class="page-item disabled"><a class="page-link">...</a></li>
+                <% } %>
+            <% } %>
+     
+            <% if (current == pages) { %>
+                <li class="page-item disabled"><a class="page-link">»</a></li>
+            <% } else { %>
+                <li class="page-item"><a class="page-link" href="/movies?page=<%= Number(current) + 1 %>">»</a></li>
+            <% } %>
+     
+            <% if (current == pages) { %>
+                <li class="page-item disabled"><a class="page-link">Last</a></li>
+            <% } else { %>
+                <li class="page-item"><a class="page-link" href="/movies?page=<%= pages %>">Last</a></li>
+            <% } %>
+        </ul>
+        <% } %>
+    </nav></div>
+
 </div>
 
 <% include ../partials/footer %>

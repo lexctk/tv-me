@@ -4,6 +4,8 @@ var express          = require ("express"),
     mongoose         = require ("mongoose"),
     methodOverride   = require ("method-override"),
     expressSanitizer = require ("express-sanitizer"),
+    flash            = require ("connect-flash"),
+    moment           = require('moment'),
 
     // authentication
     passport        = require ("passport"),
@@ -18,9 +20,13 @@ var express          = require ("express"),
     authenticationRoutes = require ("./routes/authentication");
 
 // seeding database
-var seedDB = require ("./seeds");
+// var seedDB = require ("./seeds");
 
-mongoose.connect("mongodb://localhost/tvtitle");
+app.locals.moment = moment;
+app.locals.dateFormat = "MMMM Do YYYY";
+
+var databaseURL = process.env.DATABASEURL || "mongodb://localhost/tvtitle";
+mongoose.connect(databaseURL);
 
 app.set ("view engine", "ejs");
 
@@ -28,10 +34,11 @@ app.use (express.static(__dirname + "/public"));
 app.use (bodyParser.urlencoded( { extended : true } ));
 app.use (methodOverride("_method"));
 app.use (expressSanitizer());
+app.use(flash());
 
 // authentication
 app.use (require("express-session")({
-    secret: "Some phrase", //TODO: figure out how to exclude from github
+    secret: process.env.TVMESECRETKEY,
     resave: false,
     saveUninitialized: false
 }));
@@ -44,6 +51,8 @@ passport.deserializeUser (User.deserializeUser());
 // middleware that runs on every route
 app.use (function (req, res, next) {
     res.locals.currentUser = req.user;
+    res.locals.error = req.flash ("error");
+    res.locals.success = req.flash ("success");
     next();
 });
 
